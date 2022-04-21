@@ -48,6 +48,20 @@ mkdir -p /etc/docker
 tmp=$(mktemp)
 cp /etc/docker/daemon.json /etc/docker/daemon.json.orig
 jq '.["userns-remap"]="default"' /etc/docker/daemon.json > "$tmp" && mv "$tmp" /etc/docker/daemon.json
+
+echo "--------------------------------------"
+echo "   Creating docker daemon file"
+echo "--------------------------------------"
+
+cat <<EOT > /etc/docker/daemon.json
+{
+    "userns-remap": "default",
+    "default-address-pools": [
+        { "base":"${docker_network_cidrs}" , "size":24 }
+    ]
+}
+EOT
+
 echo 'export no_proxy="true"' >> /etc/default/docker
 service docker restart
 sleep 5
